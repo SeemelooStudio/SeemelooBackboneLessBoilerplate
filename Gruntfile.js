@@ -45,14 +45,43 @@ module.exports = function(grunt) {
       },
       production: {
         options: {
-          paths: ["assets/css"],
           cleancss: true,
           modifyVars: {
             imgPath: '""'
           }
         },
         files: {
-          "dist/styles.min.css": "app/less/index.less"
+          "app/less/styles/site.css": "app/less/site.less"
+        }
+      }
+    },
+    // This task simplifies working with CSS inside Backbone Boilerplate
+    // projects.  Instead of manually specifying your stylesheets inside the
+    // HTML, you can use `@imports` and this task will concatenate only those
+    // paths.
+    styles: {
+      // Out the concatenated contents of the following styles into the below
+      // development file path.
+      "dist/styles.css": {
+        // Point this to where your `index.css` file is location.
+        src: "app/less/styles/index.css",
+
+        // The relative path to use for the @imports.
+        paths: ["app/less/styles/"],
+        
+        prefix: ["app/less/styles/"],
+
+        // Rewrite image paths during release to be relative to the `img`
+        // directory.
+        forceRelative: ""
+      }
+    },
+
+    // Minify the distribution CSS.
+    cssmin: {
+      release: {
+        files: {
+          "dist/styles.min.css": ["dist/styles.css"]
         }
       }
     },
@@ -183,6 +212,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-contrib-jshint");
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks("grunt-contrib-cssmin");
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-contrib-compress");
 
@@ -194,6 +224,7 @@ module.exports = function(grunt) {
   // Grunt BBB tasks.
   grunt.loadNpmTasks("grunt-bbb-server");
   grunt.loadNpmTasks("grunt-bbb-requirejs");
+  grunt.loadNpmTasks("grunt-bbb-styles");
 
   // When running the default Grunt command, just lint the code.
   grunt.registerTask("default", [
@@ -202,6 +233,8 @@ module.exports = function(grunt) {
     "processhtml",
     "copy",
     "requirejs",
-    "less"
+    "less",
+    "styles",
+    "cssmin"
   ]);
 };
